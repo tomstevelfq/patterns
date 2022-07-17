@@ -45,10 +45,36 @@ class IDCardFactory:public Factory{
     private:
         vector<string> owners;
 };
+class Television:public Product{
+    public:
+        static int i;
+        Television(const string& str):channel(str),id(i++){}
+        void use(){
+            cout<<"the TV numbered "+to_string(i)+" is showing channel "+channel<<endl;
+        }
+    private:
+        int id;
+        string channel;
+};
+class TelevisionFactory:public Factory{
+    public:
+        Product* createProduct(const string& str){
+            return new Television(str);
+        }
+        void registerProduct(Product* p){
+            TVs.push_back(to_string(((Television*)p)->i));
+        }
+    private:
+        vector<string> TVs;
+};
+int Television::i=0;
 
 int main(){
     Factory* fac=new IDCardFactory();
     Product* idc=fac->create("hello world");
     idc->use();
+    Factory* tvfac=new TelevisionFactory();
+    Product* tv=tvfac->create("cctv");
+    tv->use();
     return 0;
 }
