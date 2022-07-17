@@ -7,6 +7,7 @@ class Factory;
 class Product;
 class IDCardFactory;
 class IDCard;
+class SingletonFactory;
 
 class Factory{
     public:
@@ -69,12 +70,34 @@ class TelevisionFactory:public Factory{
 };
 int Television::i=0;
 
+class SingletonFactory{
+    public:
+        static TelevisionFactory* tele;
+        static IDCardFactory* idc;
+        static Factory* getFactory(const string& str){
+            if(str=="TelevisonFactory"){
+                return tele;
+            }else if(str=="IDCardFactory"){
+                return idc;
+            }
+            return NULL;
+        }  
+};
+TelevisionFactory* SingletonFactory::tele=new TelevisionFactory();
+IDCardFactory* SingletonFactory::idc=new IDCardFactory();
+
 int main(){
-    Factory* fac=new IDCardFactory();
-    Product* idc=fac->create("hello world");
-    idc->use();
-    Factory* tvfac=new TelevisionFactory();
-    Product* tv=tvfac->create("cctv");
-    tv->use();
+    Factory* fac=SingletonFactory::getFactory("IDCardFactory");
+    if(fac){
+        Product* idc=fac->create("hello world");
+        idc->use();
+    }
+    Factory* tvfac=SingletonFactory::getFactory("TelevisonFactory");
+    if(tvfac){
+        Product* tv=tvfac->create("cctv");
+        Product* tv1=tvfac->create("bbc");
+        tv->use();
+        tv1->use();
+    }
     return 0;
 }
