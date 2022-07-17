@@ -3,12 +3,25 @@
 #include<thread>
 using namespace std;
 
-int fun(){
-    int a=34;
-    return a;
-}
+template<typename T>
+void test(T& t);
 
+class A{
+    public:
+        A(){}
+        string getName(){
+            return "hello world";
+        }
+};
+void fun(){
+    A a;
+    test(a);
+}
+template<typename T>
+void test(T& t){
+    cout<<t.getName()<<endl;
+}
 int main(){
-    cout<<fun()<<endl;
+    fun();
     return 0;
 }
