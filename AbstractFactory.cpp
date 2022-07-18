@@ -12,6 +12,8 @@ class ListLink;
 class ListTray;
 class ListPage;
 class ListFactory;
+class YahooFactory;
+class YahooPage;
 
 class Factory{
     public:
@@ -29,6 +31,9 @@ class Factory{
         virtual Item* createLink(const string& cap,const string& url)=0;
         virtual Item* createTray(const string& cap)=0;
         virtual Page* createPage(const string& title,const string& author)=0;
+        virtual Page* createYahooPage(){
+            return NULL;
+        }
     private:
         static unordered_map<string,Factory*> facList;
 };
@@ -116,10 +121,28 @@ class ListFactory:public Factory{
             return new ListPage(title,author);
         }
 };
+class YahooPage:public ListPage{
+    public:
+        YahooPage():ListPage("Yahoo","Yahoo"){
+            createYahooPage();
+        }
+        void createYahooPage(){
+            ListFactory* fac=new ListFactory();
+            Item* link=fac->createLink("Yahoo","www.Yahoo.com");
+            Tray* tray=(Tray*)fac->createTray("Yahoo");
+            tray->add(link);
+            this->add(tray);
+        }
+};
+class YahooFactory:public ListFactory{
+    public:
+        Page* createYahooPage(){
+            return new YahooPage();
+        }
+};
 
 int main(){
-    ListFactory* listfac=new ListFactory();
-    Factory::registerFactory("ListFactory",listfac);
+    Factory::registerFactory("ListFactory",new ListFactory());
     Factory* fac=Factory::getFactory("ListFactory");
     Item* link=fac->createLink("baidu","www.baidu.com");
     Page* page=fac->createPage("websites collection","tomcat");
@@ -130,18 +153,15 @@ int main(){
     Tray* tray=(Tray*)fac->createTray("websites");
     Tray* tray2=(Tray*)fac->createTray("web2");
     Tray* tray3=(Tray*)fac->createTray("chinawebsite");
-    tray->add(link);
-    tray->add(link2);
-    tray->add(link3);
-    tray->add(link4);
-    tray2->add(link2);
-    tray2->add(link);
-    tray3->add(link);
-    tray3->add(link2);
-    tray3->add(link5);
-    page->add(tray);
-    page->add(tray2);
-    page->add(tray3);
+    tray->add(link).add(link2).add(link3).add(link4);
+    tray2->add(link2).add(link);
+    tray3->add(link).add(link2).add(link5);
+    page->add(tray).add(link2).add(link3);
     page->makeHTML();
+    cout<<endl<<endl<<endl;
+    Factory::registerFactory("YahooFactory",new YahooFactory());
+    Factory *yahoo=Factory::getFactory("YahooFactory");
+    Page* yahooPage=yahoo->createYahooPage();
+    yahooPage->makeHTML();
     return 0;
 }
