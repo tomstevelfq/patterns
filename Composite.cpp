@@ -62,10 +62,11 @@ class Directory:public Entry{
 class PrintStr:public Print{
     public:
         void print(File* f,const string& str){
-            cout<<str<<"/"<<f->getName()<<endl;
+            cout<<str<<"/"<<f->getName()<<" "<<f->getSize()<<endl;
         }
         void print(Directory* d,const string& str){
             string s=str+"/"+d->getName();
+            cout<<s<<" "<<d->getSize()<<endl;
             for(auto it:d->directory){
                 if(typeid(*it)==typeid(File)){
                     print(dynamic_cast<File*>(it),s);
