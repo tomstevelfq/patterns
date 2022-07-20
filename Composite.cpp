@@ -114,17 +114,17 @@ class PrintLevel:public Print{
 class PrintTree:public Print{
     public:
         void print(File* f,const string& str){
-            cout<<str<<endl;
-            cout<<str+"____"+f->getName()+" "+to_string(f->getSize())<<endl;
+            cout<<"|____"+f->getName()+" "+to_string(f->getSize())<<endl;
         }
         void print(Directory* d,const string& str){
-            cout<<str<<endl;
-            cout<<str+"____"+d->getName()+" "+to_string(d->getSize())<<endl;
-            string s=str+string(4+str.size()/2,' ')+"|";
+            cout<<"|____"+d->getName()<<endl;
+            string s=string(str.size(),' ')+"|"+string(4+d->getName().size()/2,' ');
             for(auto it:d->directory){
                 if(typeid(*it)==typeid(File)){
+                    cout<<s;
                     print(dynamic_cast<File*>(it),s);
                 }else if(typeid(*it)==typeid(Directory)){
+                    cout<<s;
                     print(dynamic_cast<Directory*>(it),s);
                 }
             }

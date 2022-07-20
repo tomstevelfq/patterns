@@ -23,6 +23,8 @@ class Director{
             b->makeTitle("Greeting");
             b->makeString("from morning to afternoon");
             b->makeItems({"GoodMorning","GoodAfternoon"});
+            b->makeString("night");
+            b->makeItems({"GoodEvening","CoodNight","Bye"});
             b->close();
         };
     private:

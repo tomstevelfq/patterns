@@ -60,5 +60,7 @@ int main(){
     cdis->display();
     AbstractDisplay* strdis=new StringDisplay("hello world");
     strdis->display();
+    strdis=new StringDisplay("nihao,shijie");
+    strdis->display();
     return 0;
 }
