@@ -9,12 +9,15 @@ class Directory;
 class Print;
 class PrintStr;
 class PrintLevel;
+class PrintTree;
 
 class Entry{
     public:
         virtual string getName()=0;
         virtual int getSize()=0;
         virtual Entry& add(Entry* e){return* this;}
+        virtual void printList()=0;
+        virtual void setPrint(Print* p)=0;
 };
 class Print{
     public:
@@ -31,14 +34,22 @@ class File:public Entry{
         int getSize(){
             return size;
         }
+        void setPrint(Print* p){
+            prt=p;
+        }
+        void printList(){
+            prt->print(this,"");
+        }
     private:
         string name;
         int size;
+        Print* prt;
 };
 class Directory:public Entry{
     public:
         friend class PrintStr;
         friend class PrintLevel;
+        friend class PrintTree;
         Directory()=default;
         Directory(const string& str):name(str){}
         string getName(){
@@ -55,9 +66,16 @@ class Directory:public Entry{
             directory.push_back(e);
             return *this;
         }
+        void setPrint(Print* p){
+            prt=p;
+        }
+        void printList(){
+            prt->print(this,"");
+        }
     private:
         string name;
         vector<Entry*> directory;
+        Print* prt;
 };
 class PrintStr:public Print{
     public:
@@ -67,6 +85,42 @@ class PrintStr:public Print{
         void print(Directory* d,const string& str){
             string s=str+"/"+d->getName();
             cout<<s<<" "<<d->getSize()<<endl;
+            for(auto it:d->directory){
+                if(typeid(*it)==typeid(File)){
+                    print(dynamic_cast<File*>(it),s);
+                }else if(typeid(*it)==typeid(Directory)){
+                    print(dynamic_cast<Directory*>(it),s);
+                }
+            }
+        }
+};
+class PrintLevel:public Print{
+    public:
+        void print(File* f,const string& str){
+            cout<<str+f->getName()+" "+to_string(f->getSize())<<endl;
+        }
+        void print(Directory* d,const string& str){
+            cout<<str+"/"+d->getName()+" "+to_string(d->getSize())<<endl;
+            string s=str+"      ";
+            for(auto it:d->directory){
+                if(typeid(*it)==typeid(File)){
+                    print(dynamic_cast<File*>(it),s);
+                }else if(typeid(*it)==typeid(Directory)){
+                    print(dynamic_cast<Directory*>(it),s);
+                }
+            }
+        }
+};
+class PrintTree:public Print{
+    public:
+        void print(File* f,const string& str){
+            cout<<str<<endl;
+            cout<<str+"____"+f->getName()+" "+to_string(f->getSize())<<endl;
+        }
+        void print(Directory* d,const string& str){
+            cout<<str<<endl;
+            cout<<str+"____"+d->getName()+" "+to_string(d->getSize())<<endl;
+            string s=str+string(4+str.size()/2,' ')+"|";
             for(auto it:d->directory){
                 if(typeid(*it)==typeid(File)){
                     print(dynamic_cast<File*>(it),s);
@@ -91,9 +145,15 @@ int main(){
     d2->add(f3).add(f4).add(f5);
     d3->add(f6);
     Directory* d4=new Directory("root");
+    d4->setPrint(new PrintStr());
     File* f7=new File("end",7676575);
     d4->add(d1).add(d2).add(d3);
-    PrintStr* pstr=new PrintStr();
-    pstr->print(d4,"");
+    d4->printList();
+    cout<<endl<<endl;
+    d4->setPrint(new PrintLevel());
+    d4->printList();
+    cout<<endl<<endl;
+    d4->setPrint(new PrintTree());
+    d4->printList();
     return 0;
 }
