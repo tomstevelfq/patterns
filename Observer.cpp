@@ -72,9 +72,30 @@ class GraphicObserver:public Observer{
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
 };
+class IncrementNumberGenerator:public NumberGenerator{
+    public:
+        IncrementNumberGenerator(int sta,int end,int gap):sta(sta),end(end),gap(gap),number(sta){}
+        int getNumber(){
+            return number;
+        }
+        void execute(){
+            for(int i=sta;i<=end;i+=gap){
+                number=i;
+                notifyObservers();
+            }
+        }
+    private:
+        int number;
+        int sta,end,gap;
+};
 
 int main(){
-    NumberGenerator* g=new RandomNumberGenerator();
+    // NumberGenerator* g=new RandomNumberGenerator();
+    // Observer* o1=new DigitObserver();
+    // Observer* o2=new GraphicObserver();
+    // g->addObserver(o1).addObserver(o2);
+    // g->execute();
+    NumberGenerator* g=new IncrementNumberGenerator(30,78,3);
     Observer* o1=new DigitObserver();
     Observer* o2=new GraphicObserver();
     g->addObserver(o1).addObserver(o2);
