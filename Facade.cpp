@@ -12,8 +12,8 @@ class Database{
     private:
         Database()=delete;
         static bool flag;
-        static void readFile(){
-            fstream fs("./test.txt");
+        static void readFile(const string& file="./test.txt"){
+            fstream fs(file);
             if(!fs.good()){
                 cout<<"fail"<<endl;
                 return;
@@ -36,6 +36,12 @@ class Database{
                 throw runtime_error("no user find");
             }
             return it->second;
+        }
+        static unordered_map<string,string>::iterator getiter(){
+            return prop.begin();
+        }
+        static unordered_map<string,string>::iterator getend(){
+            return prop.end();
         }
         static unordered_map<string,string> prop;
 };
@@ -85,25 +91,46 @@ class PageMaker{
             hw.mailto(user,addr);
             hw.close();
         }
+        static void makeLinkPage(const string& fileName,const string& pageName){
+            Database::readFile(fileName);
+            auto it=Database::getiter();
+            auto end=Database::getend();
+            HTMLWriter hw(pageName+".html");
+            hw.title("LinkPage");
+            while(it!=end){
+                hw.link(it->second,it->first);
+                hw.paragraph("");
+                it++;
+            }
+            hw.close();
+        }
+};
+class Test {
+ public:
+  static void testWelcome() {
+    string user;
+    while (cin >> user) {
+      try {
+        PageMaker::makeWelcomePage(user);
+      } catch (runtime_error r) {
+        cout << r.what() << endl;
+        cout << "N|n is end and Y|y is continue" << endl;
+        char c;
+        cin >> c;
+        if (c != 'Y' && c != 'y') {
+          break;
+        } else {
+          continue;
+        }
+      }
+      break;
+    }
+  }
+  static void testLink() { PageMaker::makeLinkPage("test.txt", "WelcomePage"); }
 };
 
 int main(){
-    string user;
-    while(cin>>user){
-        try{
-            PageMaker::makeWelcomePage(user);
-        }catch(runtime_error r){
-            cout<<r.what()<<endl;
-            cout<<"N|n is end and Y|y is continue"<<endl;
-            char c;
-            cin>>c;
-            if(c!='Y'&&c!='y'){
-                break;
-            }else{
-                continue;
-            }
-        }
-        break;
-    }
+    Test::testLink();
+    Test::testWelcome();
     return 0;
 }
